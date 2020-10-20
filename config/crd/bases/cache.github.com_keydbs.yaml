@@ -608,6 +608,10 @@ spec:
                       type: array
                   type: object
               type: object
+            configExtraArgs:
+              additionalProperties:
+                type: string
+              type: object
             exporter:
               description: RedisExporter defines the specification for the redis exporter
               properties:
@@ -667,7 +671,7 @@ spec:
               additionalProperties:
                 type: string
               type: object
-            servicetype:
+            serviceType:
               type: string
             storage:
               description: RedisStorage defines the structure used to store the Redis
@@ -955,7 +959,7 @@ spec:
           - imagetag
           - mode
           - replicas
-          - servicetype
+          - serviceType
           type: object
         status:
           description: KeyDBStatus defines the observed state of KeyDB

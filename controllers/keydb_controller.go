@@ -38,27 +38,6 @@ import (
 	cachev1alpha1 "github.com/sfarcana/keydb-operator/api/v1alpha1"
 )
 
-//const SerectUtils = "\n" +
-//	"#!/bin/bash" +
-//	"\nset -euxo pipefail" +
-//	"\nhost=\"$(hostname)\"" +
-//	"\nport=\"6379\"" +
-//	"\nreplicas=()" +
-//	"\nfor node in {0..1}; do" +
-//	"\n  if [ \"$host\" != \"keydb-sample-${node}\" ]; then" +
-//	"\n      replicas+=(\"--replicaof keydb-sample-${node}.keydb-sample ${port}\")" +
-//	"\n  fi" +
-//	"\ndone" +
-//	"\nexec keydb-server /etc/keydb/redis.conf \\" +
-//	"\n    --active-replica yes \\" +
-//	"\n    --multi-master yes \\" +
-//	"\n    --appendonly no \\" +
-//	"\n    --bind 0.0.0.0 \\" +
-//	"\n    --port \"$port\" \\" +
-//	"\n    --protected-mode no \\" +
-//	"\n    --server-threads 2 \\" +
-//	"\n    \"${replicas[@]}\""
-
 const templateSecretsUtils = "\n" +
 	"#!/bin/bash" +
 	"\nset -euxo pipefail" +
@@ -73,12 +52,13 @@ const templateSecretsUtils = "\n" +
 	"\nexec keydb-server /etc/keydb/redis.conf \\" +
 	"\n    --active-replica yes \\" +
 	"\n    --multi-master yes \\" +
-	"\n    --appendonly no \\" +
+	"\n    --appendonly var-appendonly \\" +
 	"\n    --bind 0.0.0.0 \\" +
 	"\n    --port \"$port\" \\" +
 	"\n    --protected-mode no \\" +
-	"\n    --server-threads 2 \\" +
-	"\n    \"${replicas[@]}\""
+	"\n    --server-threads var-server-threads\\"
+
+//	"\n    \"${replicas[@]}\""
 
 // KeyDBReconciler reconciles a KeyDB object
 type KeyDBReconciler struct {
@@ -285,7 +265,7 @@ func (r *KeyDBReconciler) secretForKeydb(m *cachev1alpha1.KeyDB) *corev1.Secret 
 			OwnerReferences: m.OwnerReferences,
 		},
 		Type:       "Opaque",
-		StringData: generateSecretUtils(m.Name, m.Spec.Replicas),
+		StringData: generateSecretUtils(m.Name, m.Spec.Replicas, m.Spec.ConfigExtraArgs),
 	}
 }
 
@@ -458,7 +438,7 @@ func generateSelectorLabels(component, appLabel, name string) map[string]string 
 }
 
 // generateSecretUtils create server.sh for app
-func generateSecretUtils(svcName string, numNodes int32) map[string]string {
+func generateSecretUtils(svcName string, numNodes int32, configExtraArgs map[string]string) map[string]string {
 	utilValues := templateSecretsUtils
 
 	num := fmt.Sprint(numNodes - 1)
@@ -468,6 +448,30 @@ func generateSecretUtils(svcName string, numNodes int32) map[string]string {
 
 	// Replace with name node
 	utilValues = strings.ReplaceAll(utilValues, "var-keydb-sample", svcName)
+
+	// Replace with appendonly
+	if configExtraArgs["appendonly"] == "" {
+		utilValues = strings.ReplaceAll(utilValues, "var-appendonly", "no")
+	} else {
+		utilValues = strings.ReplaceAll(utilValues, "var-appendonly", configExtraArgs["appendonly"])
+	}
+
+	// Replace with server-threads
+	if configExtraArgs["threads"] == "" {
+		utilValues = strings.ReplaceAll(utilValues, "var-threads", "2")
+	} else {
+		utilValues = strings.ReplaceAll(utilValues, "var-server-threads", configExtraArgs["threads"])
+	}
+
+	// Replace with password
+	if configExtraArgs["password"] == "" {
+		fmt.Println("Password KeyDB is not set...")
+	} else {
+		utilValues = utilValues + "\n    --masterauth " + configExtraArgs["password"] + " \\"
+		utilValues = utilValues + "\n    --requirepass " + configExtraArgs["password"] + " \\"
+	}
+
+	utilValues = utilValues + "\n    \"${replicas[@]}\""
 
 	//value := strings.ReplaceAll(SerectUtils, "keydb-ultis", svcName)
 	return map[string]string{

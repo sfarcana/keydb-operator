@@ -33,7 +33,7 @@ type KeyDBSpec struct {
 	Replicas    int32  `json:"replicas"`
 	ImageTag    string `json:"imagetag"`
 	Mode        string `json:"mode"`
-	ServiceType string `json:"servicetype"`
+	ServiceType string `json:"serviceType"`
 
 	ImagePullPolicy    corev1.PullPolicy           `json:"imagePullPolicy,omitempty"`
 	Resources          corev1.ResourceRequirements `json:"resources,omitempty"`
@@ -43,6 +43,7 @@ type KeyDBSpec struct {
 	Tolerations        []corev1.Toleration         `json:"tolerations,omitempty"`
 	NodeSelector       map[string]string           `json:"nodeSelector,omitempty"`
 	ServiceAnnotations map[string]string           `json:"serviceAnnotations,omitempty"`
+	ConfigExtraArgs    map[string]string           `json:"configExtraArgs,omitempty"`
 }
 
 // RedisExporter defines the specification for the redis exporter

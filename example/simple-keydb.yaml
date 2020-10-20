@@ -5,7 +5,7 @@ metadata:
   name: keydb-sfarcana-sample
 spec:
   labels: {}
-  replicas: 3
+  replicas: 2
 
   imagetag: x86_64_v6.0.13 
   imagePullPolicy: "Always"
@@ -23,4 +23,8 @@ spec:
   nodeSelector: {}
   serviceAnnotations:
     tiki.vn: test
-  servicetype: ClusterIP
+  configExtraArgs:
+    threads: "1"
+    password: "doicobanlabuon"
+    appendonly: "yes"
+  serviceType: ClusterIP
