@@ -8,15 +8,18 @@ Ref: https://v0-19-x.sdk.operatorframework.io/docs/golang/installation/#addition
 Ref: https://v0-19-x.sdk.operatorframework.io/docs/golang/quickstart/
 
 - Generate CRD manifests:
-```make manifest
+```bash
+make manifest
 ```
 
 - After modifying the file has suffix `_types.go`, we always run command to update the generated code for that resource type:
-```make generate
+```bash
+make generate
 ```
 
 - Before running the operator, the CRD must be registered with the Kubernetes apiserver:
-```make install
+```bash
+make install
 ```
 ## 3. Contribute
 
