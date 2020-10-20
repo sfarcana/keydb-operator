@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -29,13 +30,41 @@ type KeyDBSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of KeyDB. Edit KeyDB_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Replicas    int32  `json:"replicas"`
+	ImageTag    string `json:"imagetag"`
+	Mode        string `json:"mode"`
+	ServiceType string `json:"servicetype"`
+
+	ImagePullPolicy    corev1.PullPolicy           `json:"imagePullPolicy,omitempty"`
+	Resources          corev1.ResourceRequirements `json:"resources,omitempty"`
+	Storage            RedisStorage                `json:"storage,omitempty"`
+	Exporter           RedisExporter               `json:"exporter,omitempty"`
+	Affinity           *corev1.Affinity            `json:"affinity,omitempty"`
+	Tolerations        []corev1.Toleration         `json:"tolerations,omitempty"`
+	NodeSelector       map[string]string           `json:"nodeSelector,omitempty"`
+	ServiceAnnotations map[string]string           `json:"serviceAnnotations,omitempty"`
+}
+
+// RedisExporter defines the specification for the redis exporter
+type RedisExporter struct {
+	Enabled         bool              `json:"enabled,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+}
+
+// RedisStorage defines the structure used to store the Redis Data
+type RedisStorage struct {
+	KeepAfterDeletion     bool                          `json:"keepAfterDeletion,omitempty"`
+	EmptyDir              *corev1.EmptyDirVolumeSource  `json:"emptyDir,omitempty"`
+	PersistentVolumeClaim *corev1.PersistentVolumeClaim `json:"persistentVolumeClaim,omitempty"`
 }
 
 // KeyDBStatus defines the observed state of KeyDB
 type KeyDBStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Nodes []string `json:"nodes"`
+	//Services []string `json:"service"`
 }
 
 // +kubebuilder:object:root=true

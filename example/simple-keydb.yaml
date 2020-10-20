@@ -1,0 +1,26 @@
+apiVersion: cache.github.com/v1alpha1
+kind: KeyDB
+metadata:
+  namespace: default
+  name: keydb-sfarcana-sample
+spec:
+  labels: {}
+  replicas: 3
+
+  imagetag: x86_64_v6.0.13 
+  imagePullPolicy: "Always"
+  resources:
+    requests:
+      cpu: "0.1"
+      memory: 256Mi
+    limits:
+      cpu: "0.2"
+      memory: 512Mi
+  mode: multi-master
+  storage: {}
+  exporter: {}
+  affinity: {}
+  nodeSelector: {}
+  serviceAnnotations:
+    tiki.vn: test
+  servicetype: ClusterIP
