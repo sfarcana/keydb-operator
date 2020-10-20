@@ -22,7 +22,7 @@ spec:
   affinity: {}
   nodeSelector: {}
   serviceAnnotations:
-    tiki.vn: test
+    test.vn: test
   configExtraArgs:
     threads: "1"
     password: "doicobanlabuon"
