@@ -209,36 +209,36 @@ func (r *KeyDBReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	}
 
-	// // // List the service for this keydb's statefulset
-	// serviceList := &corev1.ServiceList{}
-	// servicelistOpts := []client.ListOption{
-	// 	client.InNamespace(keydb.Namespace),
-	// 	client.MatchingLabels(labelsForKeydb(keydb.Name)),
-	// }
-	// if err = r.List(ctx, serviceList, servicelistOpts...); err != nil {
-	// 	log.Error(err, "Failed to list service", "KeyDB.Namespace", keydb.Namespace, "keydb.Name", keydb.Name)
-	// 	return ctrl.Result{}, err
-	// }
+	// // List the service for this keydb's statefulset
+	serviceList := &corev1.ServiceList{}
+	servicelistOpts := []client.ListOption{
+		client.InNamespace(keydb.Namespace),
+		client.MatchingLabels(labelsForKeydb(keydb.Name)),
+	}
+	if err = r.List(ctx, serviceList, servicelistOpts...); err != nil {
+		log.Error(err, "Failed to list service", "KeyDB.Namespace", keydb.Namespace, "keydb.Name", keydb.Name)
+		return ctrl.Result{}, err
+	}
 
-	// var serviceNames []string
-	// for _, serviceName := range serviceList.Items {
-	// 	fmt.Println("Service Name is:  ", serviceName)
-	// 	serviceNames = append(serviceNames, serviceName.Name)
-	// }
+	var serviceNames []string
+	for _, serviceName := range serviceList.Items {
+		fmt.Println("Service Name is:  ", serviceName)
+		serviceNames = append(serviceNames, serviceName.Name)
+	}
 
-	// fmt.Println("List servicesList: ", serviceList.Items[0].Name)
-	// fmt.Println("List servicesList new: ", serviceNames)
+	fmt.Println("List servicesList: ", serviceList.Items[0].Name)
+	fmt.Println("List servicesList new: ", serviceNames)
 
-	// // Update status.Service if needed
-	// if !reflect.DeepEqual(serviceList.Items, keydb.Status.Services) {
-	// 	//keydb.Status.Services[0] = serviceList.Items[0].Name
-	// 	keydb.Status.Services = serviceNames
-	// 	err := r.Status().Update(ctx, keydb)
-	// 	if err != nil {
-	// 		log.Error(err, "Failed to update KeyDb status")
-	// 		return ctrl.Result{}, err
-	// 	}
-	// }
+	// Update status.Service if needed
+	if !reflect.DeepEqual(serviceList.Items, keydb.Status.Services) {
+		//keydb.Status.Services[0] = serviceList.Items[0].Name
+		keydb.Status.Services = serviceNames
+		err := r.Status().Update(ctx, keydb)
+		if err != nil {
+			log.Error(err, "Failed to update KeyDb status")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{RequeueAfter: time.Second * 5}, nil
 }

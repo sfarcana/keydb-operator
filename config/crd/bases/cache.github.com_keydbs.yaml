@@ -971,8 +971,13 @@ spec:
               items:
                 type: string
               type: array
+            service:
+              items:
+                type: string
+              type: array
           required:
           - nodes
+          - service
           type: object
       type: object
   version: v1alpha1

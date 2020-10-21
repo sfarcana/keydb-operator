@@ -64,8 +64,8 @@ type RedisStorage struct {
 type KeyDBStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Nodes []string `json:"nodes"`
-	//Services []string `json:"service"`
+	Nodes    []string `json:"nodes"`
+	Services []string `json:"service"`
 }
 
 // +kubebuilder:object:root=true
